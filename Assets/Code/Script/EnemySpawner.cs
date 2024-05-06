@@ -35,8 +35,16 @@ public class EnemySpawner : MonoBehaviour
         {
             if (timeUntilSpawn <= 0)
             {
-                Instantiate(_enemyPrefab, transform.position, Quaternion.identity);
+                Instantiate(_enemyPrefab, new Vector2(Random.Range(-8, 8), Random.Range(-4, 4)), Quaternion.identity);
                 SetTimeUntilSpawn();
+                if (minimumSpawnTime > 2)
+                {
+                    minimumSpawnTime--;
+                }
+                if (maximumSpawnTime > 2)
+                {
+                    maximumSpawnTime--;
+                }
             }
         }
     }

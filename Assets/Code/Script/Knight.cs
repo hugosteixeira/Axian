@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 public class Knight : MonoBehaviour
 {
     Animator animator;
-    Rigidbody2D rigidbody2D;
+    Rigidbody2D rb;
     float jumpForce = 3;
     float speed = 2.0f;
     bool attacking = false;
@@ -18,13 +18,13 @@ public class Knight : MonoBehaviour
     void Start()
     {
         animator = GetComponent<Animator>();
-        rigidbody2D = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        rigidbody2D.velocity = new Vector2(horizontalInput * speed, rigidbody2D.velocity.y);
+        rb.velocity = new Vector2(horizontalInput * speed, rb.velocity.y);
     }
 
     public void OnHeavyAttack()
@@ -41,7 +41,7 @@ public class Knight : MonoBehaviour
         {
             animator.StopPlayback();
             animator.SetTrigger("Jump");
-            rigidbody2D.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
         }
     }
 

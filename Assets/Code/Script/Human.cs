@@ -6,37 +6,48 @@ using UnityEngine.InputSystem;
 public class Human : MonoBehaviour
 {
 
-    Rigidbody2D rigidbody2D;
+    Rigidbody2D rb;
     BoxCollider2D boxCollider2D;
 
-    float speed = 2.0f;
+    float speed = 1.0f;
     Vector2 movement = new Vector2(0, 0);
     Animator animator;
     public bool isAlive = true;
+    public bool isAttacking = false;
+    GameController gameController;
     // Start is called before the first frame update
     void Start()
     {
+        Time.timeScale = 1;
         animator = GetComponent<Animator>();
-        rigidbody2D = GetComponent<Rigidbody2D>();
+        rb = GetComponent<Rigidbody2D>();
         boxCollider2D = GetComponent<BoxCollider2D>();
-        rigidbody2D.freezeRotation = true;
+        gameController = GameObject.Find("GameController").GetComponent<GameController>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (gameController.isPaused)
+        {
+            return;
+        }
         if (isAlive)
         {
-            rigidbody2D.velocity = new Vector2(movement[0] * speed, movement[1] * speed);
+            rb.velocity = new Vector2(movement[0] * speed, movement[1] * speed);
         }
         else
         {
-            rigidbody2D.velocity = Vector2.zero;
+            rb.velocity = Vector2.zero;
         }
 
     }
     void OnMove(InputValue vector)
     {
+        if (gameController.isPaused)
+        {
+            return;
+        }
         Vector2 vec = vector.Get<Vector2>();
         movement = vec.normalized;
         if (isAlive)
@@ -55,7 +66,17 @@ public class Human : MonoBehaviour
 
     void OnAttack()
     {
+        if (gameController.isPaused)
+        {
+            return;
+        }
         animator.SetTrigger("Attack");
+        isAttacking = true;
+    }
+
+    void FinishAttack()
+    {
+        isAttacking = false;
     }
 
     void UpdateDirection(Vector2 vector)
@@ -95,20 +116,24 @@ public class Human : MonoBehaviour
 
     void OnCollisionEnter2D(Collision2D collision)
     {
+        if (gameController.isPaused)
+        {
+            return;
+        }
         if (collision.gameObject.tag == ("Enemy"))
         {
-            AnimatorClipInfo[] nextAnimation = animator.GetNextAnimatorClipInfo(0);
-            if (nextAnimation.Length != 0 && nextAnimation[0].clip.name.Contains("attack"))
+            if (!isAttacking)
             {
-                Animator enemyAnimator = collision.gameObject.GetComponent<Animator>();
-                enemyAnimator.SetTrigger("Die");
-                Destroy(collision.gameObject);
-            }
-            else
-            {
-                animator.SetBool("Dead", true);
-                isAlive = false;
+                Die();
             }
         }
+    }
+
+    private void Die()
+    {
+        Time.timeScale = 0;
+        animator.SetBool("Dead", true);
+        isAlive = false;
+        gameController.PlayerDie();
     }
 }

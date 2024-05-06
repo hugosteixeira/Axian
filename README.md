@@ -1,7 +1,7 @@
 
 # Axian
 
-Link para o jogo rodando: https://hugosteixeira.itch.io/axian
+Link para o jogo rodando: https://hugosteixeira.github.io/Axian/Build/
 
 
 
